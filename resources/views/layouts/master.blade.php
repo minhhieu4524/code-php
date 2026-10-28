@@ -63,7 +63,7 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <h5 class="text-white font-weight-bold">V-NEWS - BÁO ĐIỆN TỬ</h5>
-                    <p class="small">Tổng biên tập: Vũ Minh Hiếu<br>Trụ sở: Hà Nội, Việt Nam<br>Hotline: 0912.345.678</p>
+                    <p class="small">Tổng biên tập: Vũ Minh Hiếu<br>Trụ sở: Hà Nội, Việt Nam<br>Hotline: 0343.669.581</p>
                 </div>
                 <div class="col-md-4 mb-3">
                     <h5 class="text-white font-weight-bold">Chuyên mục chính</h5>
