@@ -1,52 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Đăng ký</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
-<div class="container mt-5" style="max-width: 450px;">
-    <div class="card shadow">
-        <div class="card-header bg-success text-white text-center">
-            <h4>Đăng ký tài khoản mới</h4>
-        </div>
-        <div class="card-body">
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    @foreach($errors->all() as $error)
-                        <p class="mb-0">{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
+@extends('layouts.master')
 
-            <form action="{{ route('register') }}" method="POST">
-                @csrf
-                <div class="form-group">
-                    <label>Họ và tên:</label>
-                    <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
+@section('content')
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white text-center font-weight-bold">Đăng ký tài khoản mới</div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('register') }}">
+                        @csrf
+
+                        <div class="form-group">
+                            <label>Họ và tên:</label>
+                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required autofocus>
+                            @error('name')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Địa chỉ Email:</label>
+                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
+                            @error('email')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mật khẩu:</label>
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+                            @error('password')<span class="invalid-feedback"><strong>{{ $message }}</strong></span>@enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nhập lại mật khẩu:</label>
+                            <input type="password" name="password_confirmation" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-block">Đăng ký</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('login') }}">Đã có tài khoản? Đăng nhập ngay</a>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Địa chỉ Email:</label>
-                    <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
-                </div>
-                <div class="form-group">
-                    <label>Mật khẩu:</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Nhập lại mật khẩu:</label>
-                    <input type="password" name="password_confirmation" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-success btn-block">Đăng ký</button>
-            </form>
-            <div class="text-center mt-3">
-                <p>Đã có tài khoản? <a href="{{ route('login') }}">Đăng nhập ngay</a></p>
-                <p><a href="{{ route('home') }}">← Quay về trang chủ</a></p>
             </div>
         </div>
     </div>
 </div>
-</body>
-</html>
+@endsection

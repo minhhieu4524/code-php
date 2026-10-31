@@ -14,7 +14,7 @@ class WelcomeController extends Controller
     {
         return view('dashboard');
     }
-    public function user($name)
+    public function user($name) 
     {
         return view('user', ['name' => $name]); //view {{$name}}
     }

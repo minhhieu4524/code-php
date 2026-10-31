@@ -35,6 +35,7 @@
             </form>
             <div class="text-center mt-3">
                 <p>Chưa có tài khoản? <a href="{{ route('register') }}">Đăng ký ngay</a></p>
+                <a href="{{ route('password.request') }}" style="font-size: 14px; text-decoration: none;">Quên mật khẩu?</a>
                 <p><a href="{{ route('home') }}">← Quay về trang chủ</a></p>
             </div>
         </div>
