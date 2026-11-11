@@ -3,19 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Post;
 
 class HomeController extends Controller
 {
-    public function index()
+    /**
+     * Hiển thị trang chủ với danh sách bài viết và tìm kiếm.
+     */
+    public function index(Request $request)
     {
-        // Join bảng post với bảng users để lấy tên người đăng bài
-        $posts = DB::table('post')
-            ->join('users', 'post.user_id', '=', 'users.id')
-            ->select('post.*', 'users.name as author_name')
-            ->orderBy('post.id', 'desc')
-            ->get();
+        // Khởi tạo truy vấn lấy các bài viết đã được đăng ('published') và không bị xóa mềm
+        $query = Post::where('status', 'published')->with('user');
 
-        return view('welcome', compact('posts'));
+        // 1. Xử lý tìm kiếm theo từ khóa tiêu đề
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        // Phân trang kết quả (5 bài viết mỗi trang) mới nhất lên đầu
+        $posts = $query->latest()->paginate(5)->withQueryString();
+
+        return view('welcome', compact('posts')); // Hoặc view('home') tùy theo file giao diện bạn đang dùng
     }
 }

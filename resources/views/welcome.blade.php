@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Trang chủ blog</title>
+  <title>Trang chủ blog cộng đồng</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
@@ -18,8 +18,8 @@
 <body>
 
 <div class="jumbotron text-center" style="margin-bottom:0">
-  <h1>Blog đầu tiên</h1>
-  <p>Hệ thống tin tức và chia sẻ bài viết cá nhân</p> 
+  <h1>Blog Cộng Đồng Nhiều Tác Giả</h1>
+  <p>Hệ thống tin tức, chia sẻ bài viết và quản lý nội dung số</p> 
 </div>
 
 <!-- THANH NAVBAR -->
@@ -31,8 +31,15 @@
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav ml-auto">
       @auth
-        <li class="nav-item">
-          <span class="nav-link text-warning font-weight-bold">Xin chào, {{ auth()->user()->name }}</span>
+        {{-- Nếu tài khoản là Admin, hiển thị nút vào trang quản trị --}}
+        @if(auth()->user()->role === 'admin')
+          <li class="nav-item">
+            <a class="nav-link btn btn-danger text-white px-3 ml-2 font-weight-bold" href="{{ url('/admin') }}">Quản Trị Hệ Thống</a>
+          </li>
+        @endif
+
+        <li class="nav-item align-self-center mx-2">
+          <span class="nav-link text-warning font-weight-bold p-0">Xin chào, {{ auth()->user()->name }}</span>
         </li>
         <li class="nav-item">
           <a class="nav-link btn btn-success text-white px-3 ml-2" href="{{ route('posts.create') }}">Viết bài mới</a>
@@ -40,7 +47,7 @@
         <li class="nav-item">
           <form action="{{ route('logout') }}" method="POST" class="d-inline ml-2">
             @csrf
-            <button type="submit" class="nav-link btn btn-danger text-white px-3 border-0" style="background: none;">Đăng xuất</button>
+            <button type="submit" class="nav-link btn btn-outline-light text-white px-3 border-0" style="background: none;">Đăng xuất</button>
           </form>
         </li>
       @else
@@ -64,11 +71,11 @@
     @endif
 
   <div class="row">
-    <!-- CỘT BÊN TRÁI: THÔNG TIN TÀI KHOẢN / CÁ NHÂN -->
+    <!-- CỘT BÊN TRÁI: THÔNG TIN TÀI KHOẢN / CÁ NHÂN / BỘ LỌC -->
     <div class="col-sm-4">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-secondary text-white">
-          <h4 class="mb-0">Thông tin cá nhân</h4>
+          <h4 class="mb-0">Thông tin tài khoản</h4>
         </div>
         <div class="card-body text-center">
           @auth
@@ -78,31 +85,56 @@
               </div>
             </div>
             <h5 class="font-weight-bold">{{ auth()->user()->name }}</h5>
-            <p class="text-muted mb-2">{{ auth()->user()->email }}</p>
+            <p class="text-muted mb-1">{{ auth()->user()->email }}</p>
+            <p class="small text-info font-weight-bold mb-2">Vai trò: {{ ucfirst(auth()->user()->role ?? 'user') }}</p>
             <p class="small text-success font-weight-bold">● Đang hoạt động</p>
+            
             <hr>
-            <a href="{{ route('posts.create') }}" class="btn btn-outline-primary btn-block btn-sm">Viết bài mới ngay</a>
+            
+            @if(auth()->user()->role === 'admin')
+              <a href="{{ url('/admin') }}" class="btn btn-danger btn-block btn-sm mb-2 font-weight-bold">Vào trang quản trị</a>
+            @endif
+            <a href="{{ route('posts.create') }}" class="btn btn-outline-primary btn-block btn-sm">Viết bài viết mới</a>
           @else
-            <div class="fakeimg mb-3 d-flex align-items-center justify-content-center text-white">Ảnh đại diện</div>
+            <div class="fakeimg mb-3 d-flex align-items-center justify-content-center text-white">Khách tham quan</div>
             <h5>Khách tham quan</h5>
-            <p class="text-muted small">Hãy đăng nhập để tương tác, quản lý tài khoản và đăng bài viết của riêng bạn.</p>
-            <a href="{{ route('login') }}" class="btn btn-primary btn-block btn-sm">Đăng nhập ngay</a>
+            <p class="text-muted small">Hãy đăng nhập để tương tác, tham gia bình luận và đăng tải bài viết của riêng bạn.</p>
+            <a href="{{ route('login') }}" class="btn btn-primary btn-block btn-sm mb-2">Đăng nhập ngay</a>
+            <a href="{{ route('register') }}" class="btn btn-outline-secondary btn-block btn-sm">Đăng ký tài khoản</a>
           @endauth
         </div>
       </div>
     </div>
     
-    <!-- CỘT BÊN PHẢI: DANH SÁCH BÀI VIẾT -->
+    <!-- CỘT BÊN PHẢI: DANH SÁCH BÀI VIẾT (CÓ TÌM KIẾM VÀ LỌC) -->
     <div class="col-sm-8">
-      <h2>Danh sách bài viết</h2>
+      <h2 class="mb-3">Danh sách bài viết công khai</h2>
+      
+      <!-- Thanh tìm kiếm nhanh -->
+      <form action="{{ route('home') }}" method="GET" class="input-group mb-4">
+          <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tiêu đề bài viết..." value="{{ request('search') }}">
+          <div class="input-group-append">
+              <button class="btn btn-outline-primary" type="submit">Tìm kiếm</button>
+              @if(request('search'))
+                  <a href="{{ route('home') }}" class="btn btn-outline-secondary">Làm mới</a>
+              @endif
+          </div>
+      </form>
+      
       <hr>
+
       @forelse($posts as $post)
           <div class="mb-5 card p-4 shadow-sm">
-              <h3 class="text-primary">{{ $post->title }}</h3>
+              <h3 class="text-primary">
+                  <a href="{{ isset($post->slug) ? route('posts.show', $post->slug) : '#' }}" class="text-decoration-none">
+                      {{ $post->title }}
+                  </a>
+              </h3>
               
-              <!-- Hiển thị tên tác giả liên kết từ bảng users -->
+              <!-- Tác giả & Ngày đăng -->
               <h6 class="text-muted mb-3">
-                  Tác giả: <span class="text-dark font-weight-bold">{{ $post->author_name ?? 'Ẩn danh' }}</span> | Ngày đăng: {{ $post->created_at }}
+                  Tác giả: <span class="text-dark font-weight-bold">{{ $post->user->name ?? $post->author_name ?? 'Ẩn danh' }}</span> | 
+                  Ngày đăng: {{ $post->created_at->format('d/m/Y H:i') }}
               </h6>
               
               @if(!empty($post->image))
@@ -111,10 +143,11 @@
 
               <p style="white-space: pre-line;">{{ $post->description }}</p>
 
-              <!-- Chỉ hiện nút Sửa/Xóa nếu user đang đăng nhập là chủ bài viết -->
+              <!-- Phân quyền nút Sửa/Xóa: Chủ bài viết HOẶC Admin đều được phép can thiệp -->
               @auth
-                  @if($post->user_id == auth()->id())
-                      <div class="mt-3">
+                  @if($post->user_id == auth()->id() || auth()->user()->role === 'admin')
+                      <div class="mt-3 border-top pt-2">
+                          <span class="text-muted small mr-2">Quyền quản lý:</span>
                           <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning btn-sm text-white">Sửa bài viết</a>
                           <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?');">
                               @csrf
@@ -126,14 +159,21 @@
               @endauth
           </div>
       @empty
-          <div class="alert alert-info">Chưa có bài viết nào được đăng. Hãy đăng nhập và tạo bài viết đầu tiên của bạn!</div>
+          <div class="alert alert-info">Chưa có bài viết nào được đăng. Hãy đăng nhập và chia sẻ bài viết đầu tiên của bạn!</div>
       @endforelse
+
+      <!-- Phân trang -->
+      @if(method_exists($posts, 'links'))
+          <div class="d-flex justify-content-center mt-4">
+              {{ $posts->links() }}
+          </div>
+      @endif
     </div>
   </div>
 </div>
 
 <div class="jumbotron text-center" style="margin-bottom:0; margin-top:30px;">
-  <p class="mb-0">Footer - Bản quyền thuộc về Blog của bạn</p>
+  <p class="mb-0">Hệ thống Blog Cộng Đồng - Phát triển bởi Vũ Minh Hiếu</p>
 </div>
 
 </body>
